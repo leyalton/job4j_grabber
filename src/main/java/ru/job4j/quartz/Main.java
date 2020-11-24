@@ -1,9 +1,6 @@
 package ru.job4j.quartz;
 
 public class Main {
-    public int getVal() {
-        return val;
-    }
 
     public final int val;
 
