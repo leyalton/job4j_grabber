@@ -15,7 +15,7 @@ after_success:
 notifications:
   email:
     recipients:
-      -youremail@smtp.ru
+      -youremail@gmail.com
     on_success: never # default: change
     on_failure: always # default: always
 
