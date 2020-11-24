@@ -1,3 +1,4 @@
+codecov: true
 language: java
 jdk:
   - openjdk14
@@ -10,7 +11,7 @@ after_success:
 notifications:
   email:
     recipients:
-      -youremail@gmail.com
+      -email
     on_success: never
     on_failure: always
 
