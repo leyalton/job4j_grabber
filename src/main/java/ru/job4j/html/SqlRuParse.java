@@ -44,13 +44,15 @@ public class SqlRuParse {
     }
 
     public static void main(String[] args) throws Exception {
-        Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
-        Elements elements = doc.select(".postslisttopic");
-        for (Element header : elements) {
-            Element href = header.child(0);
-            Element date = href.parent().parent().child(5);
-            SqlRuParse sqlRuParse = new SqlRuParse();
-            System.out.println(href.text() + " - " + sqlRuParse.parse(date.text()));
+        for (int i = 1; i < 5; i++){
+            Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + i).get();
+            Elements elements = doc.select(".postslisttopic");
+            for (Element header : elements) {
+                Element href = header.child(0);
+                Element date = href.parent().parent().child(5);
+                SqlRuParse sqlRuParse = new SqlRuParse();
+                System.out.println(href.text() + " - " + sqlRuParse.parse(date.text()));
+            }
         }
     }
 }
