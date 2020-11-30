@@ -74,3 +74,4 @@ build
 .gradle
 *.pid
 *.properties
+.properties
