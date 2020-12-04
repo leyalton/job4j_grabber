@@ -15,9 +15,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class AlertRabbit {
     private Properties properties;
     Connection connection = null;
-
-    // Чтение из конфигурационного файла
-    // Properties properties = new Properties();
     public void start() {
         try (InputStream inputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             properties.load(inputStream);
