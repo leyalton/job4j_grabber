@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/leyalton/job4j_grabber.svg?branch=main)](https://travis-ci.org/leyalton/job4j_grabber)
+
 [![codecov](https://codecov.io/gh/leyalton/job4j_grabber/branch/main/graph/badge.svg?token=XMQ705PAUU)](https://codecov.io/gh/leyalton/job4j_grabber)
 # job4j_grabber
 
