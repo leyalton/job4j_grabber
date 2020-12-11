@@ -5,7 +5,6 @@
     <packaging>jar</packaging>
     <version>3.0</version>
     <name>grabber</name>
-    <url>http://job4j.ru/</url>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -42,7 +41,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.6</version>
                 <executions>
                     <execution>
                         <goals>
