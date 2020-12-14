@@ -2,13 +2,11 @@ package ru.job4j.quartz;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 
 public class Rabbit implements Job {
-    private Connection connection;
+    Connection connection;
 
     // создание таблицы SQL
     public void creatTable() {
@@ -23,8 +21,7 @@ public class Rabbit implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+    public void execute(JobExecutionContext jobExecutionContext) {
         try {
             this.connection = (Connection) jobExecutionContext.getJobDetail().getJobDataMap().get("connection");
             this.creatTable();

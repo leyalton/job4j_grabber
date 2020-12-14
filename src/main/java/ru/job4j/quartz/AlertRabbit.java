@@ -53,8 +53,7 @@ public class AlertRabbit {
 
     public Connection getConnection() {
         Connection connection = null;
-        try (InputStream inputStream =
-                     AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+        try (InputStream inputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             this.properties = new Properties();
             this.properties.load(inputStream);
             Class.forName(this.properties.getProperty("driver"));
