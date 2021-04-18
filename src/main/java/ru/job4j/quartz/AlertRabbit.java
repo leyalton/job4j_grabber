@@ -5,69 +5,49 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.JobBuilder.*;
+import static org.quartz.TriggerBuilder.*;
+import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
-    private Properties properties;
+    public static void main(String[] args) {
+        Properties properties = new Properties();
+        try (InputStream rabbitProperties = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
+            properties.load(rabbitProperties);
 
-    public void start() {
-        try {
-            // 1. Конфигурирование.
+            //конфигурирование
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
 
-            JobDataMap data = new JobDataMap();
-            data.put("connection", this.getConnection());
+            //создание задачи
+            JobDetail job = newJob(Rabbit.class).build();
 
-            // 2. Создание задачи.
-            JobDetail job = newJob(Rabbit.class)
-                    .usingJobData(data)
-                    .build();
-
-            // 3. Создание расписания.
+            //создание расписания с чтением из properties
             SimpleScheduleBuilder times = simpleSchedule()
                     .withIntervalInSeconds(Integer.parseInt(properties.getProperty("rabbit.interval")))
                     .repeatForever();
 
-            // 4. Задача выполняется через триггер.
+            //задача выполняется через триггер
             Trigger trigger = newTrigger()
                     .startNow()
                     .withSchedule(times)
                     .build();
 
-            // 5. Загрузка задачи и триггера в планировщик
+            //загрузка задачи и триггера в планировщик
             scheduler.scheduleJob(job, trigger);
-            Thread.sleep(10000);
-            scheduler.shutdown();
-        } catch (Exception se) {
+        } catch (SchedulerException | IOException se) {
             se.printStackTrace();
         }
     }
 
-    public Connection getConnection() {
-        Connection connection = null;
-        try (InputStream inputStream = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
-            this.properties = new Properties();
-            this.properties.load(inputStream);
-            Class.forName(this.properties.getProperty("driver"));
-            connection = DriverManager.getConnection(
-                    this.properties.getProperty("url"),
-                    this.properties.getProperty("username"),
-                    this.properties.getProperty("password"));
-        } catch (IOException | ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+    //quartz каждый раз создает объект с типом org.quartz.Job. Вам нужно создать класс реализующий этот интерфейс.
+    //Внутри этого класса нужно описать требуемые действия. В нашем случае - это вывод на консоль текста.
+    public static class Rabbit implements Job {
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            System.out.println("Rabbit runs here ...");
         }
-        return connection;
-    }
-
-    public static void main(String[] args) {
-        new AlertRabbit().start();
     }
 }
