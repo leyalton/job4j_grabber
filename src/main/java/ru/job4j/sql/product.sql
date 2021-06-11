@@ -42,7 +42,7 @@ select * from product where name like 'мороженое%';
 --все продукты, срок годности которых уже истек
 select p.name, p.expired_date from product as p
 group by p.expired_date, p.name
-having p.expired_date > 'today';
+having p.expired_date < now();
 
 -- название самого дорогого продукта
 select name from product
