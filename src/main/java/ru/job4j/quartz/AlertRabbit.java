@@ -19,13 +19,15 @@ public class AlertRabbit {
 
     public static void main(String[] args) throws ClassNotFoundException {
         Properties properties = new Properties();
-        Class.forName("org.postgresql.Driver");
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream in = classloader.getResourceAsStream("rabbit.properties")) {
             properties.load(in);
             String url = properties.getProperty("jdbc.url");
             String login = properties.getProperty("jdbc.username");
             String password = properties.getProperty("jdbc.password");
+            String driver = properties.getProperty("jdbc.driver");
+            String interval = properties.getProperty("rabbit.interval");
+            Class.forName(driver);
             try (Connection connection = DriverManager.getConnection(url, login, password)) {
                 Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                 scheduler.start();
@@ -35,7 +37,7 @@ public class AlertRabbit {
                         .usingJobData(data)
                         .build();
                 SimpleScheduleBuilder times = simpleSchedule()
-                        .withIntervalInSeconds(5)
+                        .withIntervalInSeconds(Integer.parseInt(interval))
                         .repeatForever();
                 Trigger trigger = newTrigger()
                         .startNow()
@@ -56,15 +58,14 @@ public class AlertRabbit {
     public static class Rabbit implements Job {
         @Override
         public void execute(JobExecutionContext context) throws JobExecutionException {
-            System.out.println("Rabbit runs here ...");
-            try (Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection")) {
-                try (Statement statement = connection.createStatement()) {
-                    String sql = String.format("insert into rabbit (create_date) values (" + System.currentTimeMillis() + ")");
-                    statement.execute(sql);
-                }
+            Connection connection = (Connection) context.getJobDetail().getJobDataMap().get("connection");
+            try (Statement statement = connection.createStatement()) {
+                String sql = String.format("insert into rabbit (create_date) values (" + System.currentTimeMillis() + ")");
+                statement.execute(sql);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
+
         }
     }
 }
