@@ -13,25 +13,41 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", link='" + link + '\'' +
-                ", description='" + description + '\'' +
-                ", created=" + created +
+        return "Post{"
+                +
+                "id=" + id
+                +
+                ", title='" + title + '\''
+                +
+                ", link='" + link + '\''
+                +
+                ", description='" + description + '\''
+                +
+                ", created=" + created
+                +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Post)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Post)) {
+            return false;
+        }
         Post post = (Post) o;
-        return id == post.id &&
-                Objects.equals(title, post.title) &&
-                Objects.equals(link, post.link) &&
-                Objects.equals(description, post.description) &&
+        return id == post.id
+                &&
+                Objects.equals(title, post.title)
+                &&
+                Objects.equals(link, post.link)
+                &&
+                Objects.equals(description, post.description)
+                &&
                 Objects.equals(created, post.created);
+
+
     }
 
     @Override
