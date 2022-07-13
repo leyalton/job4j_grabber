@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HabrCareerParse implements Parse {
-
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
     private static final int FIRST_PAGES = 5;
@@ -31,20 +30,22 @@ public class HabrCareerParse implements Parse {
             Connection connection = Jsoup.connect(String.format("%s?page=%s", PAGE_LINK, i));
             Document document = connection.get();
             Elements rows = document.select(".vacancy-card__inner");
-            rows.forEach(row -> {
-                Element titleElement = row.select(".vacancy-card__title").first();
-                Element dateElement = row.select(".vacancy-card__date").first().child(0);
-                Element linkElement = titleElement.child(0);
-                String vacancyName = titleElement.text();
-                String linkOffer = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-                String date = dateElement.attr("datetime");
-                String description = this.retrieveDescription(linkOffer);
-                Post post = new Post(vacancyName, linkOffer, description, dateTimeParser.parse(date));
-                posts.add(post);
-                System.out.printf("%s %s %s %s%n ", vacancyName, linkOffer, description, date);
-            });
+            rows.forEach(row ->
+                    posts.add(parsing(row)));
         }
         return posts;
+    }
+
+    public Post parsing(Element element) {
+        Element titleElement = element.select(".vacancy-card__title").first();
+        Element dateElement = element.select(".vacancy-card__date").first().child(0);
+        Element linkElement = titleElement.child(0);
+        String vacancyName = titleElement.text();
+        String linkOffer = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
+        String date = dateElement.attr("datetime");
+        String description = this.retrieveDescription(linkOffer);
+        System.out.printf("%s %s %s %s%n ", vacancyName, linkOffer, description, date);
+        return new Post(vacancyName, linkOffer, description, dateTimeParser.parse(date));
     }
 
     private String retrieveDescription(String link) {
@@ -61,7 +62,7 @@ public class HabrCareerParse implements Parse {
 
     public static void main(String[] args) throws IOException {
         HabrCareerDateTimeParser dateParser = new HabrCareerDateTimeParser();
-        HabrCareerParse parser = new HabrCareerParse(dateParser);
-        parser.list(PAGE_LINK).forEach(System.out::println);
+        HabrCareerParse habrCareerParse = new HabrCareerParse(dateParser);
+        habrCareerParse.list(PAGE_LINK).forEach(System.out::println);
     }
 }
