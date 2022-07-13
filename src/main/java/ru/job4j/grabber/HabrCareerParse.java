@@ -36,12 +36,12 @@ public class HabrCareerParse implements Parse {
                 Element dateElement = row.select(".vacancy-card__date").first().child(0);
                 Element linkElement = titleElement.child(0);
                 String vacancyName = titleElement.text();
-                String link_offer = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
+                String linkOffer = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
                 String date = dateElement.attr("datetime");
-                String description = this.retrieveDescription(link_offer);
-                Post post = new Post(vacancyName, link_offer, description, dateTimeParser.parse(date));
+                String description = this.retrieveDescription(linkOffer);
+                Post post = new Post(vacancyName, linkOffer, description, dateTimeParser.parse(date));
                 posts.add(post);
-                System.out.printf("%s %s %s %s%n ", vacancyName, link_offer, description, date);
+                System.out.printf("%s %s %s %s%n ", vacancyName, linkOffer, description, date);
             });
         }
         return posts;
