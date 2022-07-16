@@ -28,11 +28,11 @@ public class HabrCareerParse implements Parse {
         List<Post> posts = new ArrayList<>();
         for (int i = 1; i <= FIRST_PAGES; i++) {
             Connection connection = Jsoup.connect(String.format("%s?page=%s", PAGE_LINK, i));
-            Document document = null;
+            Document document;
             try {
                 document = connection.get();
-            } catch (IllegalArgumentException | IOException e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                throw new IllegalArgumentException();
             }
             Elements rows = document.select(".vacancy-card__inner");
             rows.forEach(row ->
