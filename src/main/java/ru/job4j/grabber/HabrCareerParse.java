@@ -16,7 +16,7 @@ import java.util.List;
 public class HabrCareerParse implements Parse {
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
-    private static final int FIRST_PAGES = 5;
+    private static final int FIRST_PAGES = 1;
     private final DateTimeParser dateTimeParser;
 
     public HabrCareerParse(DateTimeParser dateTimeParser) {
@@ -25,10 +25,10 @@ public class HabrCareerParse implements Parse {
 
     @Override
     public List<Post> list(String link) {
+            Document document;
         List<Post> posts = new ArrayList<>();
         for (int i = 1; i <= FIRST_PAGES; i++) {
             Connection connection = Jsoup.connect(String.format("%s?page=%s", PAGE_LINK, i));
-            Document document;
             try {
                 document = connection.get();
             } catch (IOException e) {
