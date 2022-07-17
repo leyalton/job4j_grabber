@@ -43,13 +43,7 @@ public class PsqlStore implements Store, AutoCloseable {
         try (PreparedStatement prepState = cnn.prepareStatement("select * from post;")) {
             ResultSet resultSet = prepState.executeQuery();
             while (resultSet.next()) {
-                Post post = new Post(
-                        resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getString(4),
-                        resultSet.getTimestamp(5).toLocalDateTime());
-                posts.add(post);
+                posts.add(getValues(resultSet));
             }
             return posts;
         }
@@ -57,17 +51,13 @@ public class PsqlStore implements Store, AutoCloseable {
 
     @Override
     public Post findById(int id) throws SQLException {
-        Post post = new Post();
-        String sql = String.format("select id, name, text, link, created from post where id = %s;", id);
+        Post post = null;
+        String sql = "select id, name, text, link, created from post where id = ?;";
         try (PreparedStatement prepState = cnn.prepareStatement(sql)) {
+            prepState.setInt(1, id);
             ResultSet resultSet = prepState.executeQuery();
-            while (resultSet.next()) {
-                post = new Post(
-                        resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getString(4),
-                        resultSet.getTimestamp(5).toLocalDateTime());
+            if (resultSet.next()) {
+                post = getValues(resultSet);
             }
             return post;
         }
@@ -80,6 +70,15 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
+    public Post getValues(ResultSet resultSet) throws SQLException {
+        return new Post(
+                resultSet.getInt(1),
+                resultSet.getString(2),
+                resultSet.getString(3),
+                resultSet.getString(4),
+                resultSet.getTimestamp(5).toLocalDateTime());
+    }
+
     public static void main(String[] args) {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream inputStream = classloader.getResourceAsStream("app.properties")) {
@@ -89,21 +88,18 @@ public class PsqlStore implements Store, AutoCloseable {
                 HabrCareerDateTimeParser dateParser = new HabrCareerDateTimeParser();
                 HabrCareerParse habrCareerParse = new HabrCareerParse(dateParser);
                 String link = String.format("%s/vacancies/java_developer", "https://career.habr.com");
-
                 for (Post vacancy : habrCareerParse.list(link)) {
-                    System.out.println("проверка строки");
                     System.out.println(vacancy);
                     psqlStore.save(vacancy);
                 }
-                System.out.println("выводим все");
                 System.out.println(psqlStore.getAll());
-                System.out.println(psqlStore.findById(340));
-
+                System.out.println(psqlStore.findById(360));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
 
 
