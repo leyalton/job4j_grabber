@@ -21,6 +21,15 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class Grabber implements Grab {
     private final Properties cfg = new Properties();
 
+    public static void main(String[] args) throws Exception {
+        Grabber grab = new Grabber();
+        grab.cfg();
+        Scheduler scheduler = grab.scheduler();
+        Store store = grab.store();
+        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
+        grab.web(store);
+    }
+
     public Store store() {
         return new PsqlStore(cfg);
     }
@@ -78,13 +87,14 @@ public class Grabber implements Grab {
     }
 
     public static class GrabJob implements Job {
+        final String LINK = "https://career.habr.com/vacancies/java_developer";
 
         @Override
         public void execute(JobExecutionContext context) {
             JobDataMap map = context.getJobDetail().getJobDataMap();
             Store store = (Store) map.get("store");
             Parse parse = (Parse) map.get("parse");
-            List<Post> posts = parse.list("https://career.habr.com/vacancies/java_developer");
+            List<Post> posts = parse.list(LINK);
 
             for (Post post : posts) {
                 try {
@@ -94,14 +104,5 @@ public class Grabber implements Grab {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Grabber grab = new Grabber();
-        grab.cfg();
-        Scheduler scheduler = grab.scheduler();
-        Store store = grab.store();
-        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
-        grab.web(store);
     }
 }
