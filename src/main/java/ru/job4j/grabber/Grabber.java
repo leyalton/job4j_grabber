@@ -20,7 +20,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 public class Grabber implements Grab {
     private final Properties cfg = new Properties();
-
+    private static final String LINK = "https://career.habr.com/vacancies/java_developer";
     public static void main(String[] args) throws Exception {
         Grabber grab = new Grabber();
         grab.cfg();
@@ -87,7 +87,6 @@ public class Grabber implements Grab {
     }
 
     public static class GrabJob implements Job {
-        private static final String LINK = "https://career.habr.com/vacancies/java_developer";
 
         @Override
         public void execute(JobExecutionContext context) {
