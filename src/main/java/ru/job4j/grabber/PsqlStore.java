@@ -1,5 +1,7 @@
 package ru.job4j.grabber;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 import ru.job4j.grabber.utils.Post;
 
@@ -10,8 +12,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class PsqlStore implements Store, AutoCloseable {
-
-    private final Connection cnn;
+    private static final Logger LOG = LogManager.getLogger(PsqlStore.class.getName());
+    private Connection cnn;
 
     public PsqlStore(Properties cfg) {
         try {
@@ -20,13 +22,13 @@ public class PsqlStore implements Store, AutoCloseable {
             String login = cfg.getProperty("jdbc.username");
             String password = cfg.getProperty("jdbc.password");
             cnn = DriverManager.getConnection(url, login, password);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        } catch (SQLException | ClassNotFoundException e) {
+            LOG.error("Exception in add", e);
         }
     }
 
     @Override
-    public void save(Post post) throws Exception {
+    public void save(Post post) {
         String sql = "insert into post(name, text, link, created) values (?, ?, ?, ?) on conflict (link) do nothing;";
         try (PreparedStatement ps = cnn.prepareStatement(sql)) {
             ps.setString(1, post.getTitle());
@@ -34,23 +36,27 @@ public class PsqlStore implements Store, AutoCloseable {
             ps.setString(3, post.getLink());
             ps.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
             ps.execute();
+        } catch (SQLException e) {
+            LOG.error("Exception in add", e);
         }
     }
 
     @Override
-    public List<Post> getAll() throws Exception {
+    public List<Post> getAll() {
         List<Post> posts = new ArrayList<>();
         try (PreparedStatement prepState = cnn.prepareStatement("select * from post;")) {
             ResultSet resultSet = prepState.executeQuery();
             while (resultSet.next()) {
                 posts.add(getValues(resultSet));
             }
-            return posts;
+        } catch (SQLException e) {
+            LOG.error("Exception in add", e);
         }
+        return posts;
     }
 
     @Override
-    public Post findById(int id) throws SQLException {
+    public Post findById(int id) {
         Post post = null;
         String sql = "select id, name, text, link, created from post where id = ?;";
         try (PreparedStatement prepState = cnn.prepareStatement(sql)) {
@@ -59,8 +65,10 @@ public class PsqlStore implements Store, AutoCloseable {
             if (resultSet.next()) {
                 post = getValues(resultSet);
             }
-            return post;
+        } catch (SQLException e) {
+            LOG.error("Exception in add", e);
         }
+        return post;
     }
 
     @Override
@@ -99,7 +107,6 @@ public class PsqlStore implements Store, AutoCloseable {
             e.printStackTrace();
         }
     }
-
 }
 
 
