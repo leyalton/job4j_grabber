@@ -22,8 +22,8 @@ public class PsqlStore implements Store, AutoCloseable {
             String login = cfg.getProperty("jdbc.username");
             String password = cfg.getProperty("jdbc.password");
             cnn = DriverManager.getConnection(url, login, password);
-        } catch (SQLException | ClassNotFoundException e) {
-            LOG.error("Exception in add", e);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
     }
 
